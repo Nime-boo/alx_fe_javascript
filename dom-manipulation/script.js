@@ -105,9 +105,9 @@ function syncQuotes(serverQuotes) {
 function showSyncNotification() {
   const notification = document.createElement("div");
   notification.classList.add("notification");
-  notification.textContent = "Data has been synced with the server!";
+  notification.textContent = "Quotes synced with server!";  // The required text
   document.body.appendChild(notification);
-  
+
   setTimeout(() => notification.remove(), 3000); // Remove notification after 3 seconds
 }
 
