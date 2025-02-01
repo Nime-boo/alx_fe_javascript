@@ -38,15 +38,12 @@ function addQuote() {
   }
 }
 
-// Function to populate categories in the dropdown
+// Function to populate categories in the dropdown using map
 function populateCategories() {
   const categoryFilter = document.getElementById('categoryFilter');
-  const categories = new Set(); // To store unique categories
-
-  // Loop through quotes and add categories to the set
-  quotes.forEach(quote => {
-    categories.add(quote.category);
-  });
+  
+  // Use map to get a list of unique categories
+  const categories = [...new Set(quotes.map(quote => quote.category))];
 
   // Clear the existing options except for "All Categories"
   categoryFilter.innerHTML = '<option value="all">All Categories</option>';
@@ -81,7 +78,8 @@ function filterQuotes() {
   const quoteDisplay = document.getElementById('quoteDisplay');
   quoteDisplay.innerHTML = ''; // Clear the current display
 
-  filteredQuotes.forEach(quote => {
+  // Map through the filtered quotes and display them
+  filteredQuotes.map(quote => {
     const quoteElement = document.createElement('p');
     quoteElement.innerHTML = `"${quote.text}" - <em>${quote.category}</em>`;
     quoteDisplay.appendChild(quoteElement);
