@@ -45,6 +45,9 @@ function addQuote() {
     localStorage.setItem("quotes", JSON.stringify(quotes)); // Save to local storage
     renderQuotes();
     populateCategories(); // Update categories dropdown
+
+    // Send the new quote to the server via POST request
+    postQuoteToServer(newQuote);
   }
 }
 
@@ -135,6 +138,30 @@ function importFromJsonFile(event) {
     showSyncNotification(); // Notify user that the import was successful
   };
   fileReader.readAsText(event.target.files[0]);
+}
+
+// POST request to send the new quote to the mock API
+async function postQuoteToServer(quote) {
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST", // POST request to the server
+      headers: {
+        "Content-Type": "application/json" // Tell the server the format of the data
+      },
+      body: JSON.stringify({
+        title: quote.text, // Data to send to the server (using 'title' as server expects)
+        category: quote.category // Adding category
+      })
+    });
+
+    if (response.ok) {
+      console.log("Quote successfully posted to the server!");
+    } else {
+      console.log("Failed to post quote to server!");
+    }
+  } catch (error) {
+    console.error("Error posting data to the server", error);
+  }
 }
 
 // Initial render and category population
