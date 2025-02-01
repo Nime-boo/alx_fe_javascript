@@ -67,7 +67,7 @@ async function fetchQuotesFromServer() {
       text: post.title,
       category: "ServerGenerated"
     }));
-    syncWithServerData(serverQuotes); // Sync with server data
+    syncQuotes(serverQuotes); // Sync with server data
   } catch (error) {
     console.error("Error fetching data from the server", error);
   }
@@ -81,7 +81,7 @@ function startServerSync() {
 startServerSync(); // Start syncing with the server periodically
 
 // Sync local quotes with server quotes
-function syncWithServerData(serverQuotes) {
+function syncQuotes(serverQuotes) {
   const localQuotes = JSON.parse(localStorage.getItem("quotes")) || [];
   
   serverQuotes.forEach(serverQuote => {
