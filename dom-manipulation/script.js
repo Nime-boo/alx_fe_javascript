@@ -1,5 +1,5 @@
-const API_URL = "https://jsonplaceholder.typicode.com/posts";
-let quotes = JSON.parse(localStorage.getItem("quotes")) || [];
+const API_URL = "https://jsonplaceholder.typicode.com/posts"; // Mock API URL
+let quotes = JSON.parse(localStorage.getItem("quotes")) || []; // Get quotes from local storage
 
 // Function to render quotes
 function renderQuotes() {
@@ -7,7 +7,9 @@ function renderQuotes() {
   const quotesList = document.getElementById("quotesList");
   quotesList.innerHTML = "";
 
-  const filteredQuotes = filterCategory === "all" ? quotes : quotes.filter(quote => quote.category === filterCategory);
+  const filteredQuotes = filterCategory === "all"
+    ? quotes
+    : quotes.filter(quote => quote.category === filterCategory);
 
   filteredQuotes.forEach(quote => {
     const li = document.createElement("li");
@@ -20,6 +22,7 @@ function renderQuotes() {
 function populateCategories() {
   const categories = new Set(quotes.map(quote => quote.category));
   const categoryFilter = document.getElementById("categoryFilter");
+
   categoryFilter.innerHTML = "<option value='all'>All Categories</option>";
 
   categories.forEach(category => {
@@ -28,6 +31,9 @@ function populateCategories() {
     option.textContent = category;
     categoryFilter.appendChild(option);
   });
+
+  const lastSelectedCategory = localStorage.getItem("filterCategory") || "all";
+  categoryFilter.value = lastSelectedCategory;
 }
 
 // Function to add a new quote
@@ -38,7 +44,7 @@ function addQuote() {
   if (newQuoteText && newQuoteCategory) {
     const newQuote = { text: newQuoteText, category: newQuoteCategory };
     quotes.push(newQuote);
-    localStorage.setItem("quotes", JSON.stringify(quotes));
+    localStorage.setItem("quotes", JSON.stringify(quotes)); // Save to local storage
     renderQuotes();
     populateCategories();
     postQuoteToServer(newQuote);
@@ -52,7 +58,7 @@ function filterQuotes() {
   renderQuotes();
 }
 
-// Fetch quotes from the server
+// Simulate fetching quotes from the server
 async function fetchQuotesFromServer() {
   try {
     const response = await fetch(API_URL);
@@ -64,35 +70,55 @@ async function fetchQuotesFromServer() {
   }
 }
 
-// Periodically fetch quotes
+// Function to periodically fetch quotes from the server
 function startServerSync() {
   setInterval(fetchQuotesFromServer, 10000);
 }
+
 startServerSync();
 
 // Sync local quotes with server quotes
 function syncQuotes(serverQuotes) {
   const localQuotes = JSON.parse(localStorage.getItem("quotes")) || [];
+
   serverQuotes.forEach(serverQuote => {
-    if (!localQuotes.some(quote => quote.text === serverQuote.text)) {
+    const existingQuoteIndex = localQuotes.findIndex(
+      quote => quote.category === serverQuote.category
+    );
+
+    if (existingQuoteIndex !== -1) {
+      localQuotes[existingQuoteIndex] = serverQuote;
+    } else {
       localQuotes.push(serverQuote);
     }
   });
+
   localStorage.setItem("quotes", JSON.stringify(localQuotes));
   renderQuotes();
   showSyncNotification();
 }
 
-// Show notification when synced
+// Function to show a notification when data is synced
 function showSyncNotification() {
   const notification = document.createElement("div");
   notification.classList.add("notification");
   notification.textContent = "Quotes synced with server!";
   document.body.appendChild(notification);
+
   setTimeout(() => notification.remove(), 3000);
 }
 
-// Export quotes to a JSON file
+// Function to resolve conflicts manually
+function resolveConflictsManually() {
+  console.log("Conflict resolution functionality to be added.");
+  const message = document.createElement("div");
+  message.classList.add("info-message");
+  message.textContent = "Conflict resolution feature is coming soon!";
+  document.body.appendChild(message);
+  setTimeout(() => message.remove(), 3000);
+}
+
+// Function to export quotes to a JSON file
 function exportQuotes() {
   const quotesBlob = new Blob([JSON.stringify(quotes)], { type: 'application/json' });
   const url = URL.createObjectURL(quotesBlob);
@@ -103,7 +129,7 @@ function exportQuotes() {
   URL.revokeObjectURL(url);
 }
 
-// Import quotes from a JSON file
+// Function to import quotes from a JSON file
 function importFromJsonFile(event) {
   const fileReader = new FileReader();
   fileReader.onload = function(event) {
@@ -116,7 +142,7 @@ function importFromJsonFile(event) {
   fileReader.readAsText(event.target.files[0]);
 }
 
-// POST request to send the new quote to the server
+// POST request to send the new quote to the mock API
 async function postQuoteToServer(quote) {
   try {
     const response = await fetch(API_URL, {
@@ -124,12 +150,17 @@ async function postQuoteToServer(quote) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title: quote.text, category: quote.category })
     });
-    if (response.ok) console.log("Quote successfully posted to the server!");
+
+    if (response.ok) {
+      console.log("Quote successfully posted to the server!");
+    } else {
+      console.log("Failed to post quote to server!");
+    }
   } catch (error) {
     console.error("Error posting data to the server", error);
   }
 }
 
-// Initial setup
+// Initial render and category population
 renderQuotes();
 populateCategories();
